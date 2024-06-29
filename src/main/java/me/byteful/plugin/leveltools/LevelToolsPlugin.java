@@ -2,14 +2,12 @@ package me.byteful.plugin.leveltools;
 
 import static me.byteful.plugin.leveltools.util.Text.colorize;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import me.byteful.plugin.leveltools.api.AnvilCombineMode;
 import me.byteful.plugin.leveltools.api.block.BlockDataManager;
-import me.byteful.plugin.leveltools.api.block.impl.FileBlockDataManager;
+import me.byteful.plugin.leveltools.api.block.impl.SQLiteBlockDataManager;
 import me.byteful.plugin.leveltools.api.scheduler.Scheduler;
 import me.byteful.plugin.leveltools.listeners.AnvilListener;
 import me.byteful.plugin.leveltools.listeners.BlockEventListener;
@@ -33,7 +31,7 @@ public final class LevelToolsPlugin extends JavaPlugin {
   private UpdateChecker updateChecker;
   private CompiledExpression levelXpFormula;
   private Metrics metrics;
-  private BlockDataManager blockDataManager;
+  private SQLiteBlockDataManager sqLiteBlockDataManager;
   private Scheduler scheduler;
 
   public static LevelToolsPlugin getInstance() {
@@ -53,19 +51,8 @@ public final class LevelToolsPlugin extends JavaPlugin {
     setAnvilCombineMode();
     setLevelXpFormula();
     getLogger().info("Loaded configuration...");
-
-    final Path blocksFile = getDataFolder().toPath().resolve("placed_blocks.txt");
-
-    if (!Files.exists(blocksFile)) {
-      try {
-        blocksFile.toFile().createNewFile();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-
-    blockDataManager = new FileBlockDataManager(blocksFile, scheduler);
-    blockDataManager.load();
+    Path dbPath = getDataFolder().toPath().resolve("data.db");
+    sqLiteBlockDataManager = new SQLiteBlockDataManager(dbPath);
     getLogger().info("Loaded block data manager...");
 
     if (getConfig().getBoolean("update.start")) {
@@ -95,21 +82,13 @@ public final class LevelToolsPlugin extends JavaPlugin {
     }
 
     metrics = new Metrics(this, 21451);
-    getLogger().info("Successfully started " + getDescription().getFullName() + "!");
+    getLogger().info("Successfully started " +  getDescription().getFullName() + "!");
   }
 
   @Override
   public void onDisable() {
     if (metrics != null) {
       metrics.shutdown();
-    }
-
-    if (blockDataManager != null) {
-      try {
-        blockDataManager.close();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
     }
 
     instance = null;
@@ -135,7 +114,7 @@ public final class LevelToolsPlugin extends JavaPlugin {
 
   private void registerListeners() {
     final PluginManager pm = Bukkit.getPluginManager();
-    pm.registerEvents(new BlockEventListener(blockDataManager, scheduler), this);
+    pm.registerEvents(new BlockEventListener(sqLiteBlockDataManager, scheduler), this);
     pm.registerEvents(new EntityEventListener(), this);
     pm.registerEvents(new AnvilListener(), this);
   }
@@ -172,6 +151,6 @@ public final class LevelToolsPlugin extends JavaPlugin {
   }
 
   public BlockDataManager getBlockDataManager() {
-    return blockDataManager;
+    return sqLiteBlockDataManager;
   }
 }

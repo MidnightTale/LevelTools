@@ -5,6 +5,8 @@ import static redempt.redlib.misc.FormatUtils.formatMoney;
 
 import com.cryptomorin.xseries.XSound;
 import java.util.List;
+import java.util.Objects;
+
 import me.byteful.plugin.leveltools.LevelToolsPlugin;
 import me.byteful.plugin.leveltools.api.event.LevelToolsLevelIncreaseEvent;
 import me.byteful.plugin.leveltools.api.event.LevelToolsXPIncreaseEvent;
@@ -103,9 +105,9 @@ public abstract class XPListener implements Listener {
     if (LevelToolsPlugin.getInstance().getConfig().getBoolean("display.actionBar.enabled")) {
       final String text =
           Text.colorize(
-              LevelToolsPlugin.getInstance()
-                  .getConfig()
-                  .getString("display.actionBar.text")
+              Objects.requireNonNull(LevelToolsPlugin.getInstance()
+                              .getConfig()
+                              .getString("display.actionBar.text"))
                   .replace(
                       "{progress_bar}",
                       LevelToolsUtil.createDefaultProgressBar(tool.getXp(), tool.getMaxXp()))

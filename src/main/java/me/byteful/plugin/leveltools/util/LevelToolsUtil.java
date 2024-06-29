@@ -8,6 +8,7 @@ import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.messages.ActionBar;
 import com.google.common.base.Strings;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;

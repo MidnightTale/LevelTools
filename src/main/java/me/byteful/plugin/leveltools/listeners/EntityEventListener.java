@@ -38,15 +38,11 @@ public class EntityEventListener extends XPListener {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-    if (ltype != null
-        && ltype.equalsIgnoreCase("whitelist")
-        && !entities.contains(e.getEntityType())) {
+    if (ltype.equalsIgnoreCase("whitelist") && !entities.contains(e.getEntityType())) {
       return;
     }
 
-    if (ltype != null
-        && ltype.equalsIgnoreCase("blacklist")
-        && entities.contains(e.getEntityType())) {
+    if (ltype.equalsIgnoreCase("blacklist") && entities.contains(e.getEntityType())) {
       return;
     }
 

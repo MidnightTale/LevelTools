@@ -9,6 +9,4 @@ public interface BlockDataManager extends Closeable {
   void addPlacedBlock(BlockPosition pos);
 
   void removePlacedBlock(BlockPosition pos);
-
-  void load();
 }

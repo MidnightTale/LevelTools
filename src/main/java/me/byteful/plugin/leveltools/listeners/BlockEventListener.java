@@ -3,8 +3,8 @@ package me.byteful.plugin.leveltools.listeners;
 import java.util.*;
 import java.util.stream.Collectors;
 import me.byteful.plugin.leveltools.LevelToolsPlugin;
-import me.byteful.plugin.leveltools.api.block.BlockDataManager;
 import me.byteful.plugin.leveltools.api.block.BlockPosition;
+import me.byteful.plugin.leveltools.api.block.impl.SQLiteBlockDataManager;
 import me.byteful.plugin.leveltools.api.scheduler.Scheduler;
 import me.byteful.plugin.leveltools.util.LevelToolsUtil;
 import org.bukkit.Material;
@@ -17,32 +17,32 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class BlockEventListener extends XPListener {
-  private final BlockDataManager blockDataManager;
+  private final SQLiteBlockDataManager sqLiteBlockDataManager;
   private final Scheduler scheduler;
 
-  public BlockEventListener(BlockDataManager blockDataManager, Scheduler scheduler) {
-    this.blockDataManager = blockDataManager;
+  public BlockEventListener(SQLiteBlockDataManager sqLiteBlockDataManager, Scheduler scheduler) {
+    this.sqLiteBlockDataManager = sqLiteBlockDataManager;
     this.scheduler = scheduler;
   }
 
   private boolean isPPBEnabled() {
-    return !LevelToolsPlugin.getInstance().getConfig().getBoolean("playerPlacedBlocks");
+    return LevelToolsPlugin.getInstance().getConfig().getBoolean("playerPlacedBlocks");
   }
 
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void on(BlockBreakEvent event) {
-    if (!isPPBEnabled()) return;
+    if (isPPBEnabled()) return;
 
     final Block block = event.getBlock();
     final BlockPosition pos = BlockPosition.fromBukkit(block);
-    scheduler.locationDelayed(() -> blockDataManager.removePlacedBlock(pos), block.getLocation(), 1);
+    scheduler.locationDelayed(() -> sqLiteBlockDataManager.removePlacedBlock(pos), block.getLocation(), 1);
   }
 
   @EventHandler(priority = EventPriority.LOW)
   public void on(BlockPlaceEvent event) {
-    if (!isPPBEnabled()) return;
+    if (isPPBEnabled()) return;
 
-    blockDataManager.addPlacedBlock(BlockPosition.fromBukkit(event.getBlock()));
+    sqLiteBlockDataManager.addPlacedBlock(BlockPosition.fromBukkit(event.getBlock()));
   }
 
   @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -57,7 +57,7 @@ public class BlockEventListener extends XPListener {
     final ItemStack hand = LevelToolsUtil.getHand(player);
 
     if (!LevelToolsPlugin.getInstance().getConfig().getBoolean("playerPlacedBlocks")
-        && blockDataManager.isPlacedBlock(BlockPosition.fromBukkit(block))) {
+        && sqLiteBlockDataManager.isPlacedBlock(BlockPosition.fromBukkit(block))) {
       return;
     }
 
@@ -69,11 +69,11 @@ public class BlockEventListener extends XPListener {
             .filter(Objects::nonNull)
             .collect(Collectors.toSet());
 
-    if (type != null && type.equalsIgnoreCase("whitelist") && !blocks.contains(block.getType())) {
+    if (type.equalsIgnoreCase("whitelist") && !blocks.contains(block.getType())) {
       return;
     }
 
-    if (type != null && type.equalsIgnoreCase("blacklist") && blocks.contains(block.getType())) {
+    if (type.equalsIgnoreCase("blacklist") && blocks.contains(block.getType())) {
       return;
     }
 
