@@ -26,12 +26,12 @@ public class BlockEventListener extends XPListener {
   }
 
   private boolean isPPBEnabled() {
-    return LevelToolsPlugin.getInstance().getConfig().getBoolean("playerPlacedBlocks");
+    return !LevelToolsPlugin.getInstance().getConfig().getBoolean("playerPlacedBlocks");
   }
 
   @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
   public void on(BlockBreakEvent event) {
-    if (isPPBEnabled()) return;
+    if (!isPPBEnabled()) return;
 
     final Block block = event.getBlock();
     final BlockPosition pos = BlockPosition.fromBukkit(block);
@@ -40,7 +40,7 @@ public class BlockEventListener extends XPListener {
 
   @EventHandler(priority = EventPriority.LOW)
   public void on(BlockPlaceEvent event) {
-    if (isPPBEnabled()) return;
+    if (!isPPBEnabled()) return;
 
     sqLiteBlockDataManager.addPlacedBlock(BlockPosition.fromBukkit(event.getBlock()));
   }
