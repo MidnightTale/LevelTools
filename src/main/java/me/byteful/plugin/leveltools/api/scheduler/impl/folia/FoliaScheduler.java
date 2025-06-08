@@ -26,6 +26,11 @@ public class FoliaScheduler implements Scheduler {
   }
 
   @Override
+  public void sync(Runnable runnable) {
+    Bukkit.getGlobalRegionScheduler().run(plugin, x -> runnable.run());
+  }
+
+  @Override
   public void locationDelayed(Runnable runnable, Location location, long ticksDelay) {
     Bukkit.getRegionScheduler().runDelayed(plugin, location, x -> runnable.run(), ticksDelay);
   }

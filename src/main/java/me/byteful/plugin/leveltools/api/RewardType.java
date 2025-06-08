@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+
+import me.byteful.plugin.leveltools.LevelToolsPlugin;
 import me.byteful.plugin.leveltools.api.item.LevelToolsItem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -17,11 +19,11 @@ public enum RewardType {
     @Override
     public void apply(
         @NotNull LevelToolsItem tool, @NotNull String[] split, @NotNull Player player) {
-      Bukkit.dispatchCommand(
+      LevelToolsPlugin.getInstance().getScheduler().sync(() -> Bukkit.dispatchCommand(
           Bukkit.getConsoleSender(),
           String.join(" ", Arrays.copyOfRange(split, 1, split.length))
               .replace("{player}", player.getName())
-              .replace("%player%", player.getName()));
+              .replace("%player%", player.getName())));
     }
   },
   PLAYER_COMMAND("player-command", false) {

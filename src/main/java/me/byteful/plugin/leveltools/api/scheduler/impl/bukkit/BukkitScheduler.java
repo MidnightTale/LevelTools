@@ -24,6 +24,11 @@ public class BukkitScheduler implements Scheduler {
   }
 
   @Override
+  public void sync(Runnable runnable) {
+    Bukkit.getScheduler().runTask(plugin, runnable);
+  }
+
+  @Override
   public void locationDelayed(Runnable runnable, Location location, long ticksDelay) {
     Bukkit.getScheduler().runTaskLater(plugin, runnable, ticksDelay);
   }

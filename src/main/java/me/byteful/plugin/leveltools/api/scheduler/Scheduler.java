@@ -7,6 +7,8 @@ public interface Scheduler {
 
   void syncTimer(Runnable runnable, long ticksDelay, long ticksPeriod);
 
+  void sync(Runnable runnable);
+
   void locationDelayed(Runnable runnable, Location location, long ticksDelay);
 
   ScheduledTask asyncTimer(Runnable runnable, long ticksDelay, long ticksPeriod);
